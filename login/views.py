@@ -51,7 +51,7 @@ def signin(request):
         if passwords_technical_l1[emails_technical_l1.index(email)] == password:
             times = 0
             print('Logged in TECHNICAL PAGE, returning HTTP response')
-            return render(request, '../templates/view1_template.html')
+            return render(request, '../templates/technical_template.html')
         else:
             print('Email != Password, returning HTTP response')
             return render(request, 'login.html', {'loc':report_loc,'errorclass':'alert alert-danger','error': 'Sorry. The Email and Password do not match.'})
