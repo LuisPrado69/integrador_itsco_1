@@ -31,7 +31,7 @@ Once that is done, you can run it on a localhost!
 In your Terminal / Command Prompt, type the following:
 
 ```bash
-python manage.py runserver
+python3 manage.py runserver
 ```
 You would see some logs now. Ignore them. All you have to do is visit [`localhost:8000`](http://localhost:8000) on your browser. To stop the server, return to your terminal and press `CTRL-C`.
 

@@ -1,0 +1,22 @@
+{
+    "technical": [
+        {
+            "code": "0000001",
+            "name": "name",
+            "document": "document",
+            "address": "address",
+            "phone": "phone",
+            "detail": "detail",
+            "email": "email"
+        },
+        {
+            "code": "0000002",
+            "name": "Luis",
+            "document": "1720759016",
+            "address": "Matamoros 208, Quito 170142, Ecuador",
+            "phone": "0991727516",
+            "detail": "qwerty",
+            "email": "develop@crifa.com"
+        }
+    ]
+}
