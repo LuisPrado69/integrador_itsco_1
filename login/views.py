@@ -6,7 +6,6 @@ times = 0
 
 def login(request):
     global times
-    print('Login Page Opened!')
     times += 1
     if request.path == '/login/signin/':
         report_loc = '../signin/'
@@ -16,8 +15,6 @@ def login(request):
 
 
 def signin(request):
-    print('Login Request Made!')
-    print('Reading Data from JSON')
     json2 = open('user_data.json', )
     data = json.load(json2)
     # ADMIN
@@ -48,8 +45,8 @@ def signin(request):
         print(passwords_admin_l1[emails_admin_l1.index(email)])
         if passwords_admin_l1[emails_admin_l1.index(email)] == password:
             times = 0
-            print('Logged in ADMIN PAGE, returning HTTP response')
-            return HttpResponse('Logged in ADMIN PAGE, returning HTTP response')
+            request.session['page'] = 'admin_template.html'
+            return render(request, '../templates/admin_template.html')
         else:
             print('Email != Password, returning HTTP response')
             return render(request, 'login.html', {'loc': report_loc, 'errorclass': 'alert alert-danger',
@@ -58,7 +55,7 @@ def signin(request):
     elif email in emails_technical_l1:
         if passwords_technical_l1[emails_technical_l1.index(email)] == password:
             times = 0
-            print('Logged in TECHNICAL PAGE, returning HTTP response')
+            request.session['page'] = 'technical_template.html'
             return render(request, '../templates/technical_template.html')
         else:
             print('Email != Password, returning HTTP response')
@@ -82,7 +79,11 @@ def signin(request):
 
 def incidence(request):
     global times
-    return render(request, '../templates/incidence.html')
+    json2 = open('user_data.json', )
+    data = json.load(json2)
+    technicals = data['technical'][0]
+    template = request.session['page']
+    return render(request, '../templates/incidence.html', {'technicals': technicals, 'template': template})
 
 
 def storeIncidence(request):
@@ -94,6 +95,7 @@ def storeIncidence(request):
     phone = request.POST['phone']
     detail = request.POST['detail']
     email = request.POST['email']
+    technical = request.POST['technical']
 
     json2 = open('incidence_data.json', )
     data = json.load(json2)
@@ -116,19 +118,67 @@ def storeIncidence(request):
         "address": address,
         "phone": phone,
         "detail": detail,
-        "email": email
+        "email": email,
+        "technical": technical
     }
     print(code)
-    write_json(new_data)
-    return render(request, '../templates/incidence.html')
+    write_json(new_data, 'incidence_data.json', 'technical')
+
+    # return data
+    json2 = open('user_data.json', )
+    data = json.load(json2)
+    technicals = data['technical'][0]
+    print(technicals)
+    message = 'Registro de incidencia exitoso!'
+    type = 'success'
+    template = request.session['page']
+    return render(request, '../templates/incidence.html',
+                  {'technicals': technicals, 'message': message, 'type': type, 'template': template})
 
 
-def write_json(new_data, filename='incidence_data.json'):
+def technical(request):
+    global times
+    template = request.session['page']
+    return render(request, '../templates/technical.html', {'template': template})
+
+
+def storeTechnical(request):
+    global times
+    # post data
+    email = request.POST['email']
+    password = request.POST['password']
+
+    json2 = open('user_data.json', )
+    data = json.load(json2)
+    # ADMIN
+    admin_l1 = data['technical']
+    json2.close()
+
+    # end post data
+    new_data = {
+        email: password
+    }
+    # // TODO PENDING INSIDE SAME JSON OBJECT
+    write_json(new_data, 'user_data.json', 'technical')
+
+    # return data
+    json2 = open('user_data.json', )
+    data = json.load(json2)
+    technicals = data['technical'][0]
+    print(technicals)
+    message = 'Registro de técnico exitoso!'
+    type = 'success'
+    template = request.session['page']
+    return render(request, '../templates/technical.html',
+                  {'technicals': technicals, 'message': message, 'type': type, 'template': template})
+
+
+def write_json(new_data, filename, field):
     with open(filename, 'r+') as file:
         # First we load existing data into a dict.
         file_data = json.load(file)
         # Join new_data with file_data inside emp_details
-        file_data["technical"].append(new_data)
+        file_data[field].append(new_data)
         # Sets file's current position at offset.
         file.seek(0)
         # convert back to json.

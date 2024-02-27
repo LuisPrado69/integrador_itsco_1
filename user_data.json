@@ -1,17 +1,20 @@
 {
-  "admin": [
-    {
-      "admin@company.com": "123456"
-    }
-  ],
-  "technical": [
-    {
-      "technical@company.com": "123456"
-    }
-  ],
-  "supervisor": [
-    {
-      "supervisor@company.com": "123456"
-    }
-  ]
+    "admin": [
+        {
+            "admin@company.com": "123456"
+        }
+    ],
+    "technical": [
+        {
+            "technical@company.com": "123456"
+        },
+        {
+            "person1@org.com": "placeholder"
+        }
+    ],
+    "supervisor": [
+        {
+            "supervisor@company.com": "123456"
+        }
+    ]
 }

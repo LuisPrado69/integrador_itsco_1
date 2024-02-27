@@ -7,16 +7,11 @@
             "address": "address",
             "phone": "phone",
             "detail": "detail",
-            "email": "email"
+            "email": "email",
+            "technical": "technical@company.com"
         },
         {
-            "code": "0000002",
-            "name": "Luis",
-            "document": "1720759016",
-            "address": "Matamoros 208, Quito 170142, Ecuador",
-            "phone": "0991727516",
-            "detail": "qwerty",
-            "email": "develop@crifa.com"
+            "person1@org.com": "placeholder"
         }
     ]
 }
