@@ -6,10 +6,8 @@
     ],
     "technical": [
         {
+            "DENNIS@company.com": "123456",
             "technical@company.com": "123456"
-        },
-        {
-            "person1@org.com": "placeholder"
         }
     ],
     "supervisor": [

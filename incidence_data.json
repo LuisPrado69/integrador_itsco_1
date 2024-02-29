@@ -1,5 +1,5 @@
 {
-    "technical": [
+    "incidences": [
         {
             "code": "0000001",
             "name": "name",
@@ -11,7 +11,14 @@
             "technical": "technical@company.com"
         },
         {
-            "person1@org.com": "placeholder"
+            "code": "0000002",
+            "name": "Luis",
+            "document": "1720759016",
+            "address": "Matamoros 208, Quito 170142, Ecuador",
+            "phone": "0991727516",
+            "detail": "todo ok",
+            "email": "develop@crifa.com",
+            "technical": "DENNIS"
         }
     ]
 }

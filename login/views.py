@@ -79,9 +79,9 @@ def signin(request):
 
 def incidence(request):
     global times
-    json2 = open('user_data.json', )
+    json2 = open('technicals_data.json', )
     data = json.load(json2)
-    technicals = data['technical'][0]
+    technicals = data['technicals']
     template = request.session['page']
     return render(request, '../templates/incidence.html', {'technicals': technicals, 'template': template})
 
@@ -100,7 +100,7 @@ def storeIncidence(request):
     json2 = open('incidence_data.json', )
     data = json.load(json2)
     # ADMIN
-    admin_l1 = data['technical']
+    admin_l1 = data['incidences']
 
     if len(admin_l1) > 0 and admin_l1[-1].get('code') is not None:
         code = admin_l1[-1].get('code')
@@ -121,14 +121,12 @@ def storeIncidence(request):
         "email": email,
         "technical": technical
     }
-    print(code)
-    write_json(new_data, 'incidence_data.json', 'technical')
+    write_json(new_data, 'incidence_data.json', 'incidences')
 
     # return data
-    json2 = open('user_data.json', )
+    json2 = open('technicals_data.json', )
     data = json.load(json2)
-    technicals = data['technical'][0]
-    print(technicals)
+    technicals = data['technicals'][0]
     message = 'Registro de incidencia exitoso!'
     type = 'success'
     template = request.session['page']
@@ -147,25 +145,43 @@ def storeTechnical(request):
     # post data
     email = request.POST['email']
     password = request.POST['password']
+    names = request.POST['names']
+    identify = request.POST['identify']
 
     json2 = open('user_data.json', )
     data = json.load(json2)
-    # ADMIN
-    admin_l1 = data['technical']
-    json2.close()
+    l1 = data['technical'][0]
 
-    # end post data
+    emails = list(l1.keys())
+    passwords = list(l1.values())
+    emails.append(email)
+    passwords.append(password)
+    d4 = {emails[len(emails) - 1]: passwords[len(emails) - 1]}
+    for x in range(len(emails) - 1):
+        d4 = dict(list(d4.items()) + list({emails[x]: passwords[x]}.items()))
+    with open('user_data.json', 'r+') as a:
+        file_data = json.load(a)
+        file_data['technical'] = [d4]
+        # Sets file's current position at offset.
+        a.seek(0)
+        # convert back to json.
+        json.dump(file_data, a, indent=4)
+        a.close()
+
+    # end post data technicals
     new_data = {
-        email: password
+        'email': email,
+        'password': password,
+        'names': names,
+        'identify': identify
     }
     # // TODO PENDING INSIDE SAME JSON OBJECT
-    write_json(new_data, 'user_data.json', 'technical')
+    write_json(new_data, 'technicals_data.json', 'technicals')
 
     # return data
     json2 = open('user_data.json', )
     data = json.load(json2)
     technicals = data['technical'][0]
-    print(technicals)
     message = 'Registro de técnico exitoso!'
     type = 'success'
     template = request.session['page']

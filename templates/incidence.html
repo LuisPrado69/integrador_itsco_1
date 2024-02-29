@@ -56,8 +56,8 @@
                         name="technical" required>
                     <option value="" selected>Seleccione un técnico</option>
                     {% for opt in technicals %}
-                        <option value={{ opt }}>
-                            {{ opt }}
+                        <option value={{ opt.names }}>
+                            {{ opt.names }}
                         </option>
                     {% endfor %}
                 </select>

@@ -22,6 +22,18 @@
         <form class="form-signin" action="/login/storeTechnical/" method="POST">
             {% csrf_token %}
             <div class="mb-3 mt-3">
+                <label for="names">Nombres:</label>
+                <input type="text" class="form-control" id="names" placeholder="Ingrese nombres del técnico"
+                       name="names"
+                       required>
+            </div>
+            <div class="mb-3 mt-3">
+                <label for="identify">Identificación:</label>
+                <input type="text" class="form-control" id="identify" placeholder="Ingrese identificación"
+                       name="identify"
+                       required>
+            </div>
+            <div class="mb-3 mt-3">
                 <label for="email">Correo electrónico:</label>
                 <input type="email" class="form-control" id="email" placeholder="Ingrese correo electrónico"
                        name="email"
