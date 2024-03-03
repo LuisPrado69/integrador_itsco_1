@@ -17,10 +17,14 @@
         <div class="collapse navbar-collapse" id="mynavbar">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'incidence' %}">Registro incidencia</a>
+                    <a class="nav-link" href="{% url 'index.order' num=2 %}">Ordenes en progreso</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'index.order' num=3 %}">Ordenes terminadas</a>
                 </li>
             </ul>
         </div>
+        <a class="navbar-brand" href="{% url 'login' %}">Salir</a>
     </div>
 </nav>
 {% block content %}   {% endblock %}

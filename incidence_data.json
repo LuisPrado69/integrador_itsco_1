@@ -6,9 +6,12 @@
             "document": "document",
             "address": "address",
             "phone": "phone",
-            "detail": "detail",
+            "detail": "Falla en pantalla enciende pero no da video",
+            "detail_technic": "terminado",
             "email": "email",
-            "technical": "technical@company.com"
+            "technical": "technical@company.com",
+            "price": "100",
+            "status": "FINISH"
         },
         {
             "code": "0000002",
@@ -16,9 +19,51 @@
             "document": "1720759016",
             "address": "Matamoros 208, Quito 170142, Ecuador",
             "phone": "0991727516",
-            "detail": "todo ok",
+            "detail": "Falla en teclado no funciona la tecla enter",
+            "detail_technic": "En revisión",
             "email": "develop@crifa.com",
-            "technical": "DENNIS"
+            "technical": "DENNIS",
+            "price": "",
+            "status": "IN_PROGRESS"
+        },
+        {
+            "code": "0000003",
+            "name": "Carlos",
+            "document": "1720759016",
+            "address": "Matamoros 208, Quito 170142, Ecuador",
+            "phone": "0991727516",
+            "detail": "Falla en track pad funciona a ratos",
+            "detail_technic": "En revisión",
+            "email": "develop@crifa.com",
+            "technical": "DENNIS",
+            "price": "",
+            "status": "IN_PROGRESS"
+        },
+        {
+            "code": "0000004",
+            "name": "Carlos",
+            "document": "1720759016",
+            "address": "Matamoros 208, Quito 170142, Ecuador",
+            "phone": "0991727516",
+            "detail": "Falla en parlante suena distorcionado",
+            "detail_technic": "",
+            "email": "develop@crifa.com",
+            "technical": "DENNIS",
+            "price": "",
+            "status": "PENDING"
+        },
+        {
+            "code": "0000005",
+            "name": "Carlos",
+            "document": "1720759016",
+            "address": "Matamoros 208, Quito 170142, Ecuador",
+            "phone": "0991727516",
+            "detail": "Falla en pantalla tiene una línea en la parte inferior de la pantalla y está creciendo",
+            "detail_technic": "",
+            "email": "develop@crifa.com",
+            "technical": "DENNIS",
+            "price": "",
+            "status": "PENDING"
         }
     ]
 }

@@ -1,3 +1,5 @@
+from urllib import request
+
 from django.shortcuts import render, HttpResponse
 import json
 
@@ -45,38 +47,36 @@ def signin(request):
         print(passwords_admin_l1[emails_admin_l1.index(email)])
         if passwords_admin_l1[emails_admin_l1.index(email)] == password:
             times = 0
-            request.session['page'] = 'admin_template.html'
-            return render(request, '../templates/admin_template.html')
+            request.session['page'] = 'templates/admin_template.html'
+            return render(request, '../templates/templates/admin_template.html')
         else:
-            print('Email != Password, returning HTTP response')
             return render(request, 'login.html', {'loc': report_loc, 'errorclass': 'alert alert-danger',
                                                   'error': 'Sorry. The Email and Password do not match.'})
     # TECHNICAL
     elif email in emails_technical_l1:
         if passwords_technical_l1[emails_technical_l1.index(email)] == password:
             times = 0
-            request.session['page'] = 'technical_template.html'
-            return render(request, '../templates/technical_template.html')
+            request.session['user'] = email
+            request.session['page'] = 'templates/technical_template.html'
+            return render(request, '../templates/templates/technical_template.html')
         else:
-            print('Email != Password, returning HTTP response')
             return render(request, 'login.html', {'loc': report_loc, 'errorclass': 'alert alert-danger',
                                                   'error': 'Sorry. The Email and Password do not match.'})
     # SUPERVISOR
     elif email in emails_supervisor_l1:
         if passwords_supervisor_l1[emails_supervisor_l1.index(email)] == password:
             times = 0
-            print('Logged in SUPERVISOR PAGE, returning HTTP response')
+            request.session['page'] = 'templates/supervisor_template.html'
             return HttpResponse('Logged in SUPERVISOR PAGE, returning HTTP response')
         else:
-            print('Email != Password, returning HTTP response')
             return render(request, 'login.html', {'loc': report_loc, 'errorclass': 'alert alert-danger',
                                                   'error': 'Sorry. The Email and Password do not match.'})
     else:
-        print('Account does not exist, returning HTTP response')
         return render(request, 'login.html', {'loc': report_loc, 'errorclass': 'alert alert-danger',
                                               'error': 'Sorry. No such account exists. Consider signing up!'})
 
 
+# incidence
 def incidence(request):
     global times
     json2 = open('technicals_data.json', )
@@ -118,8 +118,11 @@ def storeIncidence(request):
         "address": address,
         "phone": phone,
         "detail": detail,
+        "detail_technic": '',
+        "price": '',
         "email": email,
-        "technical": technical
+        "technical": technical,
+        "status": 'PENDING'
     }
     write_json(new_data, 'incidence_data.json', 'incidences')
 
@@ -134,6 +137,7 @@ def storeIncidence(request):
                   {'technicals': technicals, 'message': message, 'type': type, 'template': template})
 
 
+# technical
 def technical(request):
     global times
     template = request.session['page']
@@ -167,7 +171,6 @@ def storeTechnical(request):
         # convert back to json.
         json.dump(file_data, a, indent=4)
         a.close()
-
     # end post data technicals
     new_data = {
         'email': email,
@@ -175,9 +178,7 @@ def storeTechnical(request):
         'names': names,
         'identify': identify
     }
-    # // TODO PENDING INSIDE SAME JSON OBJECT
     write_json(new_data, 'technicals_data.json', 'technicals')
-
     # return data
     json2 = open('user_data.json', )
     data = json.load(json2)
@@ -187,6 +188,110 @@ def storeTechnical(request):
     template = request.session['page']
     return render(request, '../templates/technical.html',
                   {'technicals': technicals, 'message': message, 'type': type, 'template': template})
+
+
+def order(request, num):
+    global times
+    match num:
+        case 1:
+            type = 'PENDING'
+        case 2:
+            type = 'IN_PROGRESS'
+        case 3:
+            type = 'FINISH'
+    template = request.session['page']
+    admin = False
+    if template == 'templates/admin_template.html':
+        admin = True
+    # ADMIN each json
+    json2 = open('incidence_data.json', )
+    data = json.load(json2)
+    json2.close()
+    incidences = data['incidences']
+    result = []
+    for incidence in incidences:
+        if incidence["status"] == type:
+            if admin:
+                result.append(incidence)
+            else:
+                if incidence["technical"] == request.session['user']:
+                    result.append(incidence)
+    return render(request, '../templates/order/index.html', {'template': template, 'incidences': result, 'num': num})
+
+
+def orderEdit(request, code, num):
+    global times
+    template = request.session['page']
+
+    match num:
+        case 1:
+            array_type = {'code': [{
+                'code': 'IN_PROGRESS',
+                'trans': 'EN PROCESO'
+            }]}
+        case 2:
+            array_type = {'code': [{
+                'code': 'FINISH',
+                'trans': 'TERMINADO'
+            }]}
+        case _:
+            array_type = {}
+    # ADMIN each json
+    json2 = open('incidence_data.json', )
+    data = json.load(json2)
+    json2.close()
+    incidences = data['incidences']
+    result = {}
+    message = None
+    type = None
+    for incidence in incidences:
+        if (incidence["code"] == code):
+            result = incidence
+            break
+    if result == {}:
+        message = 'No se encontró orden de trabajo!'
+        type = 'danger'
+    return render(request, '../templates/order/edit.html',
+                  {'template': template, 'incidence': result, 'message': message, 'type': type,
+                   'array_type': array_type['code'], 'num': num})
+
+
+def orderUpdate(request):
+    global times
+    # post data
+    detail_technic = request.POST['detail_technic']
+    status = request.POST['status']
+    code = request.POST['code']
+    price = request.POST.get('price', 0)
+    with open('incidence_data.json', 'r+') as f:
+        data = json.load(f)
+        count = 0
+        for incidence in data['incidences']:
+            if (incidence["code"] == code):
+                data['incidences'][count]['status'] = status
+                data['incidences'][count]['detail_technic'] = detail_technic
+                if price:
+                    data['incidences'][count]['price'] = price
+            count = count + 1
+        f.seek(0)  # <--- should reset file position to the beginning.
+        json.dump(data, f, indent=4)
+        f.truncate()  # remove remaining part
+
+    # return data
+    template = request.session['page']
+    json2 = open('incidence_data.json', )
+    data = json.load(json2)
+    json2.close()
+    incidences = data['incidences']
+    result = {}
+    for incidence in incidences:
+        if (incidence["code"] == code):
+            result = incidence
+            break
+    message = 'Orden de trabajo editado correctamente!'
+    type = 'success'
+    return render(request, '../templates/order/edit.html',
+                  {'template': template, 'incidence': result, 'message': message, 'type': type})
 
 
 def write_json(new_data, filename, field):
