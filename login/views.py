@@ -201,7 +201,7 @@ def order(request, num):
             type = 'FINISH'
     template = request.session['page']
     admin = False
-    if template == 'templates/admin_template.html':
+    if template == 'templates/admin_template.html' or template == 'templates/supervisor_template.html':
         admin = True
     # ADMIN each json
     json2 = open('incidence_data.json', )
