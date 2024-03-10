@@ -64,6 +64,19 @@
             "technical": "DENNIS",
             "price": "",
             "status": "PENDING"
+        },
+        {
+            "code": "0000006",
+            "name": "Daniel Prado",
+            "document": "12345678",
+            "address": "Mena 2",
+            "phone": "0998056004",
+            "detail": "NO ENCIEND LA PC",
+            "detail_technic": "wertyui rfgthyuji / kjlreijverijvierv verojerpojepv reverovejv",
+            "price": "20",
+            "email": "santiago.010dani@hotmail.com",
+            "technical": "DENNIS",
+            "status": "FINISH"
         }
     ]
 }

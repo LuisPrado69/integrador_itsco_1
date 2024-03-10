@@ -38,7 +38,6 @@ def signin(request):
     passwords_supervisor_l1 = list(supervisor_l1.values())
 
     json2.close()
-    print('Read data from JSON')
     global times
     times = times + 1
     if request.path == '/login/signin/':
@@ -56,7 +55,7 @@ def signin(request):
             return render(request, '../templates/templates/admin_template.html')
         else:
             return render(request, 'login.html', {'loc': report_loc, 'errorclass': 'alert alert-danger',
-                                                  'error': 'Sorry. The Email and Password do not match.'})
+                                                  'error': 'Lo siento. El correo electrónico y la contraseña no coinciden.'})
     # TECHNICAL
     elif email in emails_technical_l1:
         if passwords_technical_l1[emails_technical_l1.index(email)] == password:
@@ -66,19 +65,18 @@ def signin(request):
             return render(request, '../templates/templates/technical_template.html')
         else:
             return render(request, 'login.html', {'loc': report_loc, 'errorclass': 'alert alert-danger',
-                                                  'error': 'Sorry. The Email and Password do not match.'})
+                                                  'error': 'Lo siento. El correo electrónico y la contraseña no coinciden.'})
     # SUPERVISOR
     elif email in emails_supervisor_l1:
         if passwords_supervisor_l1[emails_supervisor_l1.index(email)] == password:
             times = 0
             request.session['page'] = 'templates/supervisor_template.html'
-            return HttpResponse('Logged in SUPERVISOR PAGE, returning HTTP response')
+            return render(request, '../templates/templates/supervisor_template.html')
         else:
             return render(request, 'login.html', {'loc': report_loc, 'errorclass': 'alert alert-danger',
-                                                  'error': 'Sorry. The Email and Password do not match.'})
+                                                  'error': 'Lo siento. El correo electrónico y la contraseña no coinciden.'})
     else:
-        return render(request, 'login.html', {'loc': report_loc, 'errorclass': 'alert alert-danger',
-                                              'error': 'Sorry. No such account exists. Consider signing up!'})
+        return render(request, 'login.html', {'loc': report_loc, 'errorclass': 'alert alert-danger', 'error': 'Lo siento. El correo electrónico y la contraseña no coinciden!'})
 
 
 # incidence
@@ -138,7 +136,7 @@ def storeIncidence(request):
             <head></head>
             <body>
               <h1>Sistema de gestión de incidencias</h1>
-              <h2>Su incidecia se a registrado exitosamente a continuación adjuntamos la información de la misma</h2>
+              <h2>Su incidecia se ha registrado exitosamente a continuación adjuntamos la información de la misma</h2>
               <h3>Detalle de incidencia</h3>
               <h4>Código: """ + code + """</h4>
               <h4>Nombre: """ + name + """</h4>
