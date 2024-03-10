@@ -2,9 +2,14 @@ from urllib import request
 
 from django.shortcuts import render, HttpResponse
 import json
+from email.utils import formataddr
+from smtplib import SMTP_SSL, SMTPException
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import environ
+from datetime import datetime
 
 times = 0
-
 
 def login(request):
     global times
@@ -88,6 +93,8 @@ def incidence(request):
 
 def storeIncidence(request):
     global times
+    now = datetime.now()
+    current_time = now.strftime("%Y/%m/%d, %H:%M")
     # post data
     name = request.POST['name']
     document = request.POST['document']
@@ -126,6 +133,24 @@ def storeIncidence(request):
     }
     write_json(new_data, 'incidence_data.json', 'incidences')
 
+    # Send email
+    BODY_HTML = """<html>
+            <head></head>
+            <body>
+              <h1>Sistema de gestión de incidencias</h1>
+              <h2>Su incidecia se a registrado exitosamente a continuación adjuntamos la información de la misma</h2>
+              <h3>Detalle de incidencia</h3>
+              <h4>Código: """ + code + """</h4>
+              <h4>Nombre: """ + name + """</h4>
+              <h4>Cédula: """ + document + """</h4>
+              <h4>Dirección: """ + address + """</h4>
+              <h4>Teléfono: """ + phone + """</h4>
+              <h4>Fecha: """ + current_time + """</h4>
+            </body>
+            </html>"""
+    SUBJECT = 'Registro de incidencia'
+    send_email(email, BODY_HTML, SUBJECT)
+
     # return data
     json2 = open('technicals_data.json', )
     data = json.load(json2)
@@ -155,6 +180,32 @@ def storeTechnical(request):
     json2 = open('user_data.json', )
     data = json.load(json2)
     l1 = data['technical'][0]
+
+    json3 = open('technicals_data.json', )
+    data3 = json.load(json3)
+    l2 = data3['technicals']
+
+    # validation if user exist in list
+    validate_user = False
+    for l in l2:
+        for attribute, value in l.items():
+            if attribute == 'email':
+                if value == email:
+                    validate_user = True
+                    break
+            elif attribute == 'identity':
+                if value == identify:
+                    validate_user = True
+                    break
+    if validate_user:
+        message = 'Usuario registrado anteriormente'
+        type = 'warning'
+        json2 = open('user_data.json', )
+        data = json.load(json2)
+        technicals = data['technical'][0]
+        template = request.session['page']
+        return render(request, '../templates/technical.html',
+                      {'technicals': technicals, 'message': message, 'type': type, 'template': template})
 
     emails = list(l1.keys())
     passwords = list(l1.values())
@@ -304,3 +355,29 @@ def write_json(new_data, filename, field):
         file.seek(0)
         # convert back to json.
         json.dump(file_data, file, indent=4)
+
+def send_email(email, BODY_HTML,SUBJECT):
+    print('sending email to' + email)
+    env = environ.Env(
+        DEBUG=(bool, False)
+    )
+    SENDER = env('SENDER')
+    SENDERNAME = env('SENDERNAME')
+    USERNAME_SMTP = env('USERNAME_SMTP')
+    PASSWORD_SMTP = env('PASSWORD_SMTP')
+    HOST = env('HOST')
+    PORT = env('PORT')
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = SUBJECT
+    msg['From'] = formataddr((SENDERNAME, SENDER))
+    msg['To'] = email
+    part = MIMEText(BODY_HTML, 'html')
+    msg.attach(part)
+    try:
+        with SMTP_SSL(HOST, PORT) as server:
+            server.login(USERNAME_SMTP, PASSWORD_SMTP)
+            server.sendmail(SENDER, email, msg.as_string())
+            server.close()
+            print("Correo enviado!")
+    except SMTPException as e:
+        print("Error en el envío de email: ", e)

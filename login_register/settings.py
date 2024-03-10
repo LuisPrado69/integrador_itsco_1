@@ -13,8 +13,24 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 import mimetypes
+import environ
 
 
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+
+READ_DOT_ENV_FILE = True
+if READ_DOT_ENV_FILE:
+    environ.Env.read_env()
+
+DEBUG = env('DEBUG')
+SENDER = env('SENDER')
+SENDERNAME = env('SENDERNAME')
+USERNAME_SMTP = env('USERNAME_SMTP')
+PASSWORD_SMTP = env('PASSWORD_SMTP')
+HOST = env('HOST')
+PORT = env('PORT')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,9 +40,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'pw^)vu5-7g%#&x&#+*d(0%o!#o(uy2-i62gkgfjcn1_*zo9en('
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = []
 
