@@ -20,7 +20,6 @@ def login(request):
         report_loc = 'signin/'
     return render(request, 'login.html', {'loc': report_loc, 'error': ''})
 
-
 def signin(request):
     json2 = open('user_data.json', )
     data = json.load(json2)
@@ -78,6 +77,48 @@ def signin(request):
     else:
         return render(request, 'login.html', {'loc': report_loc, 'errorclass': 'alert alert-danger', 'error': 'Lo siento. El correo electrónico y la contraseña no coinciden!'})
 
+# settings
+def settings(request):
+    global times
+    json2 = open('settings_data.json', )
+    data = json.load(json2)
+    settings = data['settings']
+    template = request.session['page']
+    return render(request, '../templates/settings.html', {'settings': settings[0], 'template': template})
+
+def updateSettings(request):
+    # post data
+    social_reason = request.POST['social_reason']
+    name = request.POST['name']
+    ruc = request.POST['ruc']
+    email = request.POST['email']
+    phone = request.POST['phone']
+    address = request.POST['address']
+    address_2 = request.POST['address_2']
+    #  update in data json
+    with open('settings_data.json', 'r+') as jsonFile:
+        data = json.load(jsonFile)
+        file_data = [{
+            "social_reason": social_reason,
+            "name": name,
+            "ruc": ruc,
+            "email": email,
+            "phone": phone,
+            "address": address,
+            "address_2": address_2
+        }]
+        data["settings"] = file_data
+        jsonFile.seek(0)  # rewind
+        json.dump(data, jsonFile)
+        jsonFile.truncate()
+    # return data
+    message = 'Configuraciones actualizadas exitosamente!'
+    type = 'success'
+    json2 = open('settings_data.json', )
+    data = json.load(json2)
+    settings = data['settings']
+    template = request.session['page']
+    return render(request, '../templates/settings.html', {'settings': settings[0], 'template': template, 'message': message, 'type': type})
 
 # incidence
 def incidence(request):
@@ -87,7 +128,6 @@ def incidence(request):
     technicals = data['technicals']
     template = request.session['page']
     return render(request, '../templates/incidence.html', {'technicals': technicals, 'template': template})
-
 
 def storeIncidence(request):
     global times
@@ -159,13 +199,11 @@ def storeIncidence(request):
     return render(request, '../templates/incidence.html',
                   {'technicals': technicals, 'message': message, 'type': type, 'template': template})
 
-
 # technical
 def technical(request):
     global times
     template = request.session['page']
     return render(request, '../templates/technical.html', {'template': template})
-
 
 def storeTechnical(request):
     global times
@@ -238,7 +276,6 @@ def storeTechnical(request):
     return render(request, '../templates/technical.html',
                   {'technicals': technicals, 'message': message, 'type': type, 'template': template})
 
-
 def order(request, num):
     global times
     match num:
@@ -267,11 +304,9 @@ def order(request, num):
                     result.append(incidence)
     return render(request, '../templates/order/index.html', {'template': template, 'incidences': result, 'num': num})
 
-
 def orderEdit(request, code, num):
     global times
     template = request.session['page']
-
     match num:
         case 1:
             array_type = {'code': [{
@@ -304,7 +339,6 @@ def orderEdit(request, code, num):
                   {'template': template, 'incidence': result, 'message': message, 'type': type,
                    'array_type': array_type['code'], 'num': num})
 
-
 def orderUpdate(request):
     global times
     # post data
@@ -312,6 +346,7 @@ def orderUpdate(request):
     status = request.POST['status']
     code = request.POST['code']
     price = request.POST.get('price', 0)
+    validate_count = 0
     with open('incidence_data.json', 'r+') as f:
         data = json.load(f)
         count = 0
@@ -319,6 +354,7 @@ def orderUpdate(request):
             if (incidence["code"] == code):
                 data['incidences'][count]['status'] = status
                 data['incidences'][count]['detail_technic'] = detail_technic
+                validate_count = count
                 if price:
                     data['incidences'][count]['price'] = price
             count = count + 1
@@ -326,6 +362,36 @@ def orderUpdate(request):
         json.dump(data, f, indent=4)
         f.truncate()  # remove remaining part
 
+    match status:
+        case 'IN_PROGRESS':
+            # Send email
+            BODY_HTML = """<html>
+                    <head></head>
+                    <body>
+                      <h1>Sistema de gestión de incidencias</h1>
+                      <h2>Este es un mensaje para informarle que estamos trabando en su incidencia</h2>
+                      <h3>Detalle de incidencia</h3>
+                      <h4>Código: """ + data['incidences'][validate_count]['code'] + """</h4>
+                      <h4>Detalle técnico: """ + detail_technic + """</h4>
+                    </body>
+                    </html>"""
+            SUBJECT = 'Cambios en su incidencia'
+            send_email(data['incidences'][validate_count]['email'], BODY_HTML, SUBJECT)
+        case 'FINISH':
+            # Send email
+            BODY_HTML = """<html>
+                        <head></head>
+                        <body>
+                          <h1>Sistema de gestión de incidencias</h1>
+                          <h2>Este es un mensaje para informarle que hemos terminado el trabajo en su incidencia</h2>
+                          <h3>Detalle de incidencia</h3>
+                          <h4>Código: """ + data['incidences'][validate_count]['code'] + """</h4>
+                          <h4>Detalle técnico: """ + detail_technic + """</h4>
+                          <h4>Costo: """ + price + """</h4>
+                        </body>
+                        </html>"""
+            SUBJECT = 'Cambios en su incidencia'
+            send_email(data['incidences'][validate_count]['email'], BODY_HTML, SUBJECT)
     # return data
     template = request.session['page']
     json2 = open('incidence_data.json', )
@@ -341,7 +407,6 @@ def orderUpdate(request):
     type = 'success'
     return render(request, '../templates/order/edit.html',
                   {'template': template, 'incidence': result, 'message': message, 'type': type})
-
 
 def write_json(new_data, filename, field):
     with open(filename, 'r+') as file:

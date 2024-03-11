@@ -15,7 +15,6 @@ import os
 import mimetypes
 import environ
 
-
 env = environ.Env(
     DEBUG=(bool, False)
 )

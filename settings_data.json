@@ -1,0 +1,13 @@
+{
+  "settings": [
+    {
+      "social_reason": "social_reason",
+      "name": "name",
+      "ruc": "ruc",
+      "email": "email",
+      "phone": "phone",
+      "address": "address",
+      "address_2": "address_2"
+    }
+  ]
+}
